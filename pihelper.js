@@ -8,7 +8,7 @@ bleno.on('stateChange', function(state) {
   console.log('on -> stateChange: ' + state);
 
   if (state === 'poweredOn') {
-    bleno.startAdvertising('pihelper', ['a07880d721f9451982e94c1081fcb32a']);
+    bleno.startAdvertising(process.env['BLENO_DEVICE_NAME'] || 'pihelper', ['a07880d721f9451982e94c1081fcb32a']);
   } else {
     bleno.stopAdvertising();
   }
