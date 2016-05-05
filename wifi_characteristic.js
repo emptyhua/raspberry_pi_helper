@@ -10,7 +10,8 @@ var WifiCharacteristic = function() {
     properties: ['read', 'writeWithoutResponse', 'notify'],
     value: null
   });
-  this._value = new Buffer(0);
+
+  this._setting = {};
   this._updateValueCallback = null;
   this._writeTimer = null;
   this._state = 'normal';
@@ -24,7 +25,6 @@ util.inherits(WifiCharacteristic, BlenoCharacteristic);
 WifiCharacteristic.prototype.loadWifiSetting = function(cb) {
     var self = this;
     var setting = {};
-    setting['ip'] = wpa_supplicant.read_wlan0_ip();
     wpa_supplicant.read_wifi_account(function(account, err) {
         if (err && self._updateValueCallback) {
             self._updateValueCallback(new Buffer(JSON.stringify({error:'read setting failed'})));
@@ -36,14 +36,16 @@ WifiCharacteristic.prototype.loadWifiSetting = function(cb) {
                 setting['ssid'] = '';
                 setting['psk'] = '';
             }
-            self._value = new Buffer(JSON.stringify(setting));
+            self._setting = setting;
             cb && cb();
         }
     });
 };
 
 WifiCharacteristic.prototype.onReadRequest = function(offset, callback) {
-  callback(this.RESULT_SUCCESS, this._value);
+    this._setting['ip'] = wpa_supplicant.read_wlan0_ip();
+    var value = new Buffer(JSON.stringify(this._setting));
+    callback(this.RESULT_SUCCESS, value);
 };
 
 WifiCharacteristic.prototype.onReceiveData = function() {
