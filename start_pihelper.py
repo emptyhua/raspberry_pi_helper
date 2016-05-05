@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-from uuid import getnode as get_mac
 
 uart_bluetooth = None
 while not uart_bluetooth:
